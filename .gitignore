@@ -2,3 +2,8 @@
 /.project
 /build
 *~
+
+/.externalToolBuilders
+/.settings
+/resources/res
+/resources/compiled
