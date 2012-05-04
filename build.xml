@@ -9,10 +9,10 @@
     <available property="unpacked-lib" file="build/classes-lib" />
   </target>
   
-  <target name="buildinfo" depends="build-env" unless="has-buildinfo">
-    <exec executable="git" outputproperty="gitrev" failifexecutionfails="false">
-      <arg line="rev-parse HEAD" />
-    </exec>
+  <target name="buildinfo" depends="build-env">
+    <tstamp>
+        <format property="gitrev" pattern="dd.MM.yyyy HH:mm"/>
+    </tstamp>
     <echo file="build/classes/buildinfo" xml:space="default">
       git-rev = ${gitrev}
     </echo>
@@ -20,13 +20,13 @@
 
   <target name="salem-client" depends="build-env">
     <javac srcdir="src" destdir="build/classes" debug="on"
-	   source="1.5" target="1.5" includeantruntime="no">
+       source="1.6" target="1.6" includeantruntime="no">
       <classpath>
-	<pathelement path="lib/jogl.jar" />
-	<pathelement path="lib/gluegen-rt.jar" />
-	<pathelement path="lib/jnlp.jar" />
-	<pathelement path="lib/jorbis.jar" />
-	<pathelement path="lib/jogg.jar" />
+    <pathelement path="lib/jogl.jar" />
+    <pathelement path="lib/gluegen-rt.jar" />
+    <pathelement path="lib/jnlp.jar" />
+    <pathelement path="lib/jorbis.jar" />
+    <pathelement path="lib/jogg.jar" />
       </classpath>
       <compilerarg value="-Xlint:unchecked" />
       <!-- <compilerarg value="-Xbarda" /> -->
@@ -55,13 +55,24 @@
     </unjar>
   </target>
 
-  <target name="jar" depends="salem-client,buildinfo,lib-classes">
+  <target name="resources">
+      <exec executable="java" failifexecutionfails="false">
+        <arg line="-jar resources/LayerUtil.jar -re resources/src resources/compiled/res" />
+      </exec>
+      <jar destfile="build/client-res.jar" update="true">
+        <fileset dir="resources/compiled" />
+      </jar>
+  </target>
+
+  <target name="jar" depends="salem-client,buildinfo,lib-classes,resources">
     <jar destfile="build/salem.jar" update="true">
       <fileset dir="build/classes" />
       <fileset dir="build/classes-lib" />
+      <fileset file="changelog.txt"/>
+      <fileset file="etc/radar.xml"/>
       <manifest>
-	<attribute name="Main-Class" value="haven.MainFrame" />
-	<attribute name="Class-Path" value="jogl.jar gluegen-rt.jar salem-res.jar" />
+        <attribute name="Main-Class" value="haven.MainFrame" />
+        <attribute name="Class-Path" value="jogl.jar gluegen-rt.jar client-res.jar salem-res.jar" />
       </manifest>
     </jar>
     <chmod file="build/salem.jar" perm="a+x" />
@@ -69,15 +80,15 @@
   
   <target name="res-jar" depends="build-env" unless="has-res-jar">
     <get src="http://plymouth.seatribe.se/java/salem-res.jar" dest="lib/salem-res.jar"
-	 usetimestamp="true" />
+     usetimestamp="true" />
   </target>
   
   <target name="jars" depends="build-env, jar, res-jar">
     <copy todir="build">
       <fileset dir="lib">
-	<include name="jogl.jar" />
-	<include name="gluegen-rt.jar" />
-	<include name="salem-res.jar" />
+    <include name="jogl.jar" />
+    <include name="gluegen-rt.jar" />
+    <include name="salem-res.jar" />
       </fileset>
     </copy>
   </target>
@@ -89,6 +100,6 @@
   </target>
   
   <target name="clean">
-    <delete dir="build" />
+    <delete dir="build/classes" />
   </target>
 </project>
