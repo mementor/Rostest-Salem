@@ -94,6 +94,16 @@ public class MenuGrid extends Widget {
 	
     public MenuGrid(Coord c, Widget parent) {
 	super(c, bgsz.mul(gsz).add(1, 1), parent);
+	//ui.mnu = this;
+	Glob glob = ui.sess.glob;
+	Collection<Pagina> p = glob.paginae;
+	p.add(glob.paginafor(Resource.load("paginae/act/add")));
+	p.add(glob.paginafor(Resource.load("paginae/add/anime")));
+	p.add(glob.paginafor(Resource.load("paginae/add/anime/lol")));
+	p.add(glob.paginafor(Resource.load("paginae/add/anime/raeg")));
+	p.add(glob.paginafor(Resource.load("paginae/add/anime/facepalm")));
+
+	//cons(null);
     }
 	
     private static Comparator<Pagina> sorter = new Comparator<Pagina>() {
@@ -238,7 +248,11 @@ public class MenuGrid extends Widget {
     private Pagina paginafor(Resource res) {
 	return(ui.sess.glob.paginafor(res));
     }
-
+    
+    public void useres(Resource r){
+	use(paginafor(r));
+    }
+    
     private void use(Pagina r) {
 	Collection<Pagina> sub = new LinkedList<Pagina>(),
 	    cur = new LinkedList<Pagina>();
@@ -256,7 +270,13 @@ public class MenuGrid extends Widget {
 	    else
 		curoff += 14;
 	} else {
-	    wdgmsg("act", (Object[])r.act().ad);
+	    String [] ad = r.act().ad;
+		if((ad == null) || (ad.length < 1)){return;}
+		if(ad[0].equals("@")) {
+			usecustom(ad);
+		} else {
+			wdgmsg("act", (Object[])ad);
+		}
 	    this.cur = null;
 	    curoff = 0;
 	}
@@ -269,6 +289,16 @@ public class MenuGrid extends Widget {
 	    updlayout();
     }
 
+
+    private void usecustom(String[] ad) {
+	if(ad[1].equals("act")) {
+	    String[] args = new String[ad.length - 2];
+	    System.arraycopy(ad, 2, args, 0, args.length);
+	    //ui.gui.wdgmsg("act", (Object[])args);
+	}
+	use(null);
+    }
+    
     public boolean mouseup(Coord c, int button) {
 	Pagina h = bhit(c);
 	if(button == 1) {
@@ -298,6 +328,7 @@ public class MenuGrid extends Widget {
     }
 	
     public boolean globtype(char k, KeyEvent ev) {
+	if(ev.isAltDown() || ev.isControlDown()){return false;}
 	if((k == 27) && (this.cur != null)) {
 	    this.cur = null;
 	    curoff = 0;

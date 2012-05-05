@@ -61,7 +61,7 @@ public class GameUI extends ConsoleHost implements DTarget, DropTarget, Console.
     public Belt beltwdg;
     public String polowner;
     
-    public abstract class Belt {
+    public static abstract class Belt {
 	public abstract int draw(GOut g, int by);
 	public abstract boolean click(Coord c, int button);
 	public abstract boolean key(KeyEvent ev);
@@ -783,7 +783,7 @@ public class GameUI extends ConsoleHost implements DTarget, DropTarget, Console.
     }
     
     public class NKeyBelt extends Belt {
-	public int curbelt = 0;
+	public int curbelt = 2;
 	
 	private Coord beltc(int i) {
 	    return(new Coord(/* ((sz.x - (invsq.sz().x * 12) - (2 * 11)) / 2) */
