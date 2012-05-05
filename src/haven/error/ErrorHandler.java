@@ -26,6 +26,8 @@
 
 package haven.error;
 
+import haven.Config;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -94,6 +96,21 @@ public class ErrorHandler extends ThreadGroup {
 	private void doreport(Report r) throws IOException {
 	    if(!status.goterror(r.t))
 		return;
+	    if(errordest != null){
+		dourlreport(r);
+	    } else {
+		dolocalreport(r);
+	    }
+	}
+    
+	private void dolocalreport(Report r) throws IOException {
+	    FileOutputStream fs = new FileOutputStream(Config.userhome+"/error.html");
+	    HtmlReporter.makereport(fs, r);
+	    fs.close();
+	    status.done();
+	}
+
+	private void dourlreport(Report r) throws IOException {
 	    URLConnection c = errordest.openConnection();
 	    status.connecting();
 	    c.setDoOutput(true);
@@ -109,7 +126,7 @@ public class ErrorHandler extends ThreadGroup {
 	    i.close();
 	    status.done();
 	}
-    
+
 	public void report(Thread th, Throwable t) {
 	    Report r = new Report(t);
 	    r.props.putAll(props);
@@ -160,6 +177,14 @@ public class ErrorHandler extends ThreadGroup {
 	this(new ErrorStatus.Simple(), errordest);
     }
     
+    public ErrorHandler(ErrorStatus ui) {
+	this(ui, null);
+    }
+
+    public ErrorHandler() {
+	this(new ErrorStatus.Simple());
+    }
+
     public void sethandler(ErrorStatus handler) {
 	reporter.status = handler;
     }

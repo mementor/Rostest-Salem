@@ -34,11 +34,14 @@ public class Textlog extends Widget {
     static Tex texpap = Resource.loadtex("gfx/hud/texpap");
     static Tex schain = Resource.loadtex("gfx/hud/schain");
     static Tex sflarp = Resource.loadtex("gfx/hud/sflarp");
-    static RichText.Foundry fnd = new RichText.Foundry(TextAttribute.FAMILY, "SansSerif", TextAttribute.SIZE, 9, TextAttribute.FOREGROUND, Color.BLACK);
+    static RichText.Foundry deffnd = new RichText.Foundry(TextAttribute.FAMILY, "SansSerif", TextAttribute.SIZE, 12, TextAttribute.FOREGROUND, Color.BLACK);
     List<Text> lines;
     int maxy, cury;
     int margin = 3;
     boolean sdrag = false;
+    boolean quote = true;
+    public int maxLines = 150;
+    public RichText.Foundry fnd = deffnd;
 	
     static {
 	Widget.addtype("log", new WidgetFactory() {
@@ -85,12 +88,21 @@ public class Textlog extends Widget {
 	
     public void append(String line, Color col) {
 	Text rl;
+	if(quote){
+	    line = RichText.Parser.quote(line);
+	}
 	if(col == null)
-	    rl = fnd.render(RichText.Parser.quote(line), sz.x - (margin * 2) - sflarp.sz().x);
+	    rl = fnd.render(line, sz.x - (margin * 2) - sflarp.sz().x);
 	else
-	    rl = fnd.render(RichText.Parser.quote(line), sz.x - (margin * 2) - sflarp.sz().x, TextAttribute.FOREGROUND, col);
+	    rl = fnd.render(line, sz.x - (margin * 2) - sflarp.sz().x, TextAttribute.FOREGROUND, col);
 	synchronized(lines) {
 	    lines.add(rl);
+	    if((maxLines > 0)&&(lines.size() > maxLines)){
+		Text tl = lines.remove(0);
+		int dy = tl.sz().y;
+		maxy -= dy;
+		cury -= dy;
+	    }
 	}
 	if(cury == maxy)
 	    cury += rl.sz().y;
@@ -148,5 +160,13 @@ public class Textlog extends Widget {
 	    return(true);
 	}
 	return(false);
+    }
+    
+    public void setprog(double a){
+	if(a < 0)
+	    a = 0;
+	if(a > 1)
+	    a = 1;
+	cury = (int)(a * (maxy - sz.y)) + sz.y;
     }
 }
