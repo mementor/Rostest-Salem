@@ -5,7 +5,13 @@ import java.awt.event.KeyEvent;
 import haven.GameUI.Belt;
 
 public class ToolBelt extends Belt {
-
+    protected GameUI gameui;
+    protected ToolBeltWdg belt;
+    public ToolBelt(GameUI gameui) {
+	this.gameui = gameui;
+	belt = new ToolBeltWdg(gameui);
+    }
+    
     @Override
     public int draw(GOut g, int by) {
 	return 0;

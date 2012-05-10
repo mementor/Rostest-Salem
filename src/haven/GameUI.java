@@ -875,6 +875,7 @@ public class GameUI extends ConsoleHost implements DTarget, DropTarget, Console.
 	} else {
 	    beltwdg = new NKeyBelt();
 	}
+	new ToolBelt(this);
     }
     
     private Map<String, Console.Command> cmdmap = new TreeMap<String, Console.Command>();
