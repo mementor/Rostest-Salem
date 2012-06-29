@@ -107,7 +107,7 @@ public class LocalMiniMap extends Widget {
 	super(c, sz, parent);
 	this.mv = mv;
     }
-    
+
     public void draw(GOut g) {
 	Gob pl = ui.sess.glob.oc.getgob(mv.plgob);
 	if(pl == null)
