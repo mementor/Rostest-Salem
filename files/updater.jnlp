@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<jnlp spec="1.0+" codebase="http://dl.dropbox.com/u/18779594/salem/" href="updater.jnlp">
+<jnlp spec="1.0+" codebase="http://enderwiggin.github.com/Custom-Salem/files/" href="updater.jnlp">
   <information>
     <title>Custom Salem Updater</title>
     <vendor>Ender</vendor>
