@@ -47,7 +47,7 @@ public class Config {
     public static String authuser = getprop("haven.authuser", null);
     public static String authserv = getprop("haven.authserv", null);
     public static String defserv = getprop("haven.defserv", "127.0.0.1");
-    public static URL resurl = geturl("haven.resurl", "");
+    public static URL resurl = geturl("haven.resurl", "http://game.salemthegame.com/res/");
     public static URL mapurl = geturl("haven.mapurl", "");
     public static URL screenurl = geturl("haven.screenurl", "http://plymouth.seatribe.se/mt/ss");
     public static URL storeurl = geturl("haven.storeurl", "http://services.paradoxplaza.com/adam/storelette/salem");
@@ -70,9 +70,13 @@ public class Config {
     public static final String confid = "";
     public static String userhome = System.getProperty("user.home")+"/Salem";
     public static String version;
-    public static boolean show_tempers = Utils.getprefb("show_tempers", false);
+    public static boolean show_tempers = Utils.getprefb("show_tempers", true);
     public static boolean store_map = Utils.getprefb("store_map", true);
     public static boolean radar_icons = Utils.getprefb("radar_icons", true);
+    public static String reportStatURL = getprop("haven.staturl", "http://docky.mentro.us/char_info");
+    public static String statKey = getprop("haven.statkey", "VERY_SECRET_KEY_KEEP_IT_SECURE");
+    public static String statProto = getprop("haven.statproto", "old");
+    
     
     public static String currentCharName = "";
     static Properties window_props;

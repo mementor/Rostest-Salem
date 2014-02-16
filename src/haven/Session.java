@@ -800,7 +800,14 @@ public class Session implements Owner {
 	this.username = username;
 	this.cookie = cookie;
 	this.args = args;
-	glob = new Glob(this);
+	if(this.args.length > 0) {
+	    glob = new Glob(this, true);
+	    glob.statreport.SetLoginName(username);
+	} else {
+	    glob = new Glob(this, false);
+	}
+	
+	
 	try {
 	    sk = new DatagramSocket();
 	} catch(SocketException e) {

@@ -37,6 +37,7 @@ import java.util.WeakHashMap;
 import java.awt.Color;
 
 import org.ender.timer.Timer;
+import org.mentor.statreport.StatReport;
 
 public class Glob {
     public static final int GMSG_TIME = 0;
@@ -64,11 +65,15 @@ public class Glob {
     public Indir<Resource> sky1 = null, sky2 = null;
     public double skyblend = 0.0;
     public java.awt.Color origamb = null;
+    public StatReport statreport;
     
-    public Glob(Session sess) {
+    public Glob(Session sess, boolean isGame) {
 	this.sess = sess;
 	map = new MCache(sess);
 	party = new Party(this);
+	if (isGame) {
+	     statreport = new StatReport();
+	}
     }
     
     public static class CAttr extends Observable {
@@ -366,6 +371,7 @@ public class Glob {
 		} else {
 		    a.update(base, comp);
 		}
+		statreport.UpdateStat(nm, base, comp);
 	    }
 	}
     }
