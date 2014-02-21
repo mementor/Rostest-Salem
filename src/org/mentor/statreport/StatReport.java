@@ -56,7 +56,7 @@ public class StatReport {
 				}
 				if (fireRequest) {
 					fireRequest = false;
-					if (Config.statProto == "old") {
+					if (Config.statProto.equals("old")) {
 						// TODO: старый протокол, выпилить, когда будет реализация новой версии на сервере
 						// http://domain.com/stats/char/secretKey/blood/ybile/phlegm/bbile
 						String secretKey = Config.statKey;

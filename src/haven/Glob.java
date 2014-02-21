@@ -371,7 +371,9 @@ public class Glob {
 		} else {
 		    a.update(base, comp);
 		}
-		statreport.UpdateStat(nm, base, comp);
+		if ( statreport != null ) {
+		    statreport.UpdateStat(nm, base, comp);
+		}
 	    }
 	}
     }

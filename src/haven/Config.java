@@ -74,8 +74,8 @@ public class Config {
     public static boolean store_map = Utils.getprefb("store_map", true);
     public static boolean radar_icons = Utils.getprefb("radar_icons", true);
     public static String reportStatURL = getprop("haven.staturl", "http://docky.mentro.us/char_info");
-    public static String statKey = getprop("haven.statkey", "VERY_SECRET_KEY_KEEP_IT_SECURE");
-    public static String statProto = getprop("haven.statproto", "old");
+    public static String statKey = getprop("haven.statkey", "-");
+    public static String statProto = getprop("haven.statproto", "new");
     
     
     public static String currentCharName = "";
