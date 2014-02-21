@@ -462,7 +462,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	final Coord moff = new Coord(20, 0);
 	attrview = new Widget(Coord.z, new Coord(a.expsz.x, cw.attrwdgs.sz.y).add(moff).add(10, Window.cbtni[0].getHeight() + 10).add(box.bisz()), this) {
 		boolean act = false;
-		Label la;
+		Label insp;
 		int cmod = 0;
 		{
 		    Widget cbtn = new IButton(Coord.z, this, Window.cbtni[0], Window.cbtni[1], Window.cbtni[2]) {
@@ -480,7 +480,7 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		    };
 		    cbtn.c = new Coord(sz.x - Window.cbtni[0].getWidth() - cbtn.sz.x - 2, box.bt.sz().y);
 		    
-		    la = new Label(box.btloff(), this, "LA: ");
+		    insp = new Label(box.btloff(), this, "Insp: ");
 		    
 		    Coord ctl = box.btloff().add(5, 5);
 		    for(CharWnd.Attr a = (CharWnd.Attr)cw.attrwdgs.child; a != null; a = (CharWnd.Attr)a.next) {
@@ -507,9 +507,9 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 		}
     
 		public void draw(GOut g) {
-		    if(cmod != cw.cmod){
-			cmod = cw.cmod;
-			la.settext(String.format("LA: %d%%", cmod));
+		    if(cmod != cw.tmexp){
+			cmod = cw.tmexp;
+			insp.settext(String.format("Insp: %d%%", cmod));
 		    }
 		    if((fv != null) && !fv.lsrel.isEmpty())
 			return;
@@ -629,6 +629,8 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    for(int i = 0; i < 4; i++)
 		n[i] = (Integer)args[i];
 	    tm.updh(n);
+	} else if(msg == "gavail") {
+	    tm.gavail = (Integer)args[0] != 0;
 	} else if(msg == "gobble") {
 	    boolean g = (Integer)args[0] != 0;
 	    if(g && (gobble == null)) {
@@ -645,16 +647,10 @@ public class GameUI extends ConsoleHost implements Console.Directory {
 	    for(int i = 0; i < 4; i++)
 		n[i] = (Integer)args[i];
 	    gobble.updt(n);
-	} else if(msg == "gvar") {
-	    gobble.updv((Integer)args[0]);
-	} else if(msg == "gtrig") {
-	    gobble.trig((Integer)args[0]);
 	} else if(msg == "glvlup") {
 	    gobble.lvlup((Integer)args[0]);
-	} else if(msg == "ginfo") {
-	    gobble.eating(args);
-	} else if(msg == "gprog") {
-	    gobble.prog((Integer)args[0]);
+	} else if(msg == "gtypemod") {
+	    gobble.typemod(ui.sess.getres((Integer)args[0]), ((Integer)args[1]) / 100.0);
 	} else if(msg == "polowner") {
 	    String o = (String)args[0];
 	    boolean n = ((Integer)args[1]) != 0;

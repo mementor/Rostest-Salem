@@ -40,11 +40,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.imageio.ImageIO;
+
+import haven.resutil.RidgeTile;
 
 public class LocalMiniMap extends Window implements Console.Directory{
     private static final String OPT_SZ = "_sz";
@@ -130,19 +130,27 @@ public class LocalMiniMap extends Window implements Console.Directory{
 		    return null;
 		}
 		BufferedImage tex = tileimg(t, texes);
-		if(tex != null){
-		    buf.setRGB(c.x, c.y, tex.getRGB(Utils.floormod(c.x, tex.getWidth()),
-			    Utils.floormod(c.y, tex.getHeight())));
-		} else {
-		    return null;
-		}
-
-		try {
-		    if((m.gettile(c2.add(-1, 0)) > t) ||
-			    (m.gettile(c2.add( 1, 0)) > t) ||
-			    (m.gettile(c2.add(0, -1)) > t) ||
-			    (m.gettile(c2.add(0,  1)) > t))
-			buf.setRGB(c.x, c.y, Color.BLACK.getRGB());
+	    }
+	}
+	for(c.y = 1; c.y < sz.y - 1; c.y++) {
+	    for(c.x = 1; c.x < sz.x - 1; c.x++) {
+	    	try{
+		    int t = m.gettile(ul.add(c));
+		    Tiler tl = m.tiler(t);
+		    if(tl instanceof RidgeTile) {
+			if(((RidgeTile)tl).ridgep(m, ul.add(c))) {
+			    for(int y = c.y; y <= c.y + 1; y++) {
+				for(int x = c.x; x <= c.x + 1; x++) {
+				    int rgb = buf.getRGB(x, y);
+				    rgb = (rgb & 0xff000000) |
+					(((rgb & 0x00ff0000) >> 17) << 16) |
+					(((rgb & 0x0000ff00) >>  9) << 8) |
+					(((rgb & 0x000000ff) >>  1) << 0);
+				    buf.setRGB(x, y, rgb);
+				}
+			    }
+			}
+		    }
 		} catch (LoadingMap e) {
 		    continue;
 		}
@@ -236,7 +244,7 @@ public class LocalMiniMap extends Window implements Console.Directory{
 	    }
 	});
     }
-    
+
     public Coord p2c(Coord pc) {
 	return(pc.div(tilesz).sub(cc).add(sz.div(2)));
     }
@@ -466,7 +474,7 @@ public class LocalMiniMap extends Window implements Console.Directory{
     }
 
     public boolean mousedown(Coord c, int button) {
-	
+
 //	if(cc == null)
 //	    return(false);
 //	MapView mv = getparent(GameUI.class).map;
@@ -478,7 +486,7 @@ public class LocalMiniMap extends Window implements Console.Directory{
 //	else
 //	    mv.wdgmsg("click", rootpos().add(c), c2p(c), button, ui.modflags(), 0, (int)gob.id, gob.rc, 0, -1);
 	//return(true);
-	
+
 	//	if(folded) {
 	//	    return super.mousedown(c, button);
 	//	}

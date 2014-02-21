@@ -33,14 +33,21 @@ public class Inspiration extends ItemInfo.Tip {
     public final String[] attrs;
     public final int[] exp;
     public final int[] o;
-    
+
     public Inspiration(Owner owner, String[] attrs, int[] exp) {
 	super(owner);
 	this.o = CharWnd.sortattrs(attrs);
 	this.attrs = attrs;
 	this.exp = exp;
     }
-    
+
+    public int total() {
+	int ret = 0;
+	for(int lp : exp)
+	    ret += lp;
+	return(ret);
+    }
+
     public BufferedImage longtip() {
 	StringBuilder sb = new StringBuilder();
 	Color[] cs = UI.instance.gui.chrwdg.attrcols(attrs);
@@ -49,7 +56,7 @@ public class Inspiration extends ItemInfo.Tip {
 		sb.append('\n');
 	    String attr = CharWnd.attrnm.get(attrs[o[i]]);
 	    Color c = cs[o[i]];
-	    sb.append(String.format("$col[%d,%d,%d]{%s: %d}",c.getRed(), c.getGreen(), c.getBlue(), attr, exp[o[i]] ));
+	    sb.append(String.format("$col[%d,%d,%d]{%s: %d\nInspiration required: %d}",c.getRed(), c.getGreen(), c.getBlue(), attr, exp[o[i]], total() ));
 	}
 	return RichText.stdf.render(sb.toString(), 0).img;
     }

@@ -156,7 +156,6 @@ public class StatReport {
 		} catch(Exception e) {
 			return "";
 		}
-		return "";
 	}
 
 	public void SetLoginName(String loginName) {

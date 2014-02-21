@@ -34,8 +34,8 @@ import java.io.*;
 import java.lang.ref.*;
 
 public class Session implements Owner {
-    public static final int PVER = 32;
-    
+    public static final int PVER = 33;
+
     public static final int MSG_SESS = 0;
     public static final int MSG_REL = 1;
     public static final int MSG_ACK = 2;
@@ -71,9 +71,9 @@ public class Session implements Owner {
     public static final int SESSERR_CONN = 3;
     public static final int SESSERR_PVER = 4;
     public static final int SESSERR_EXPR = 5;
-    
+
     static final int ackthresh = 30;
-	
+
     DatagramSocket sk;
     SocketAddress server;
     Thread rworker, sworker, ticker;
@@ -92,20 +92,20 @@ public class Session implements Owner {
     final Map<Integer, CachedRes> rescache = new TreeMap<Integer, CachedRes>();
     public final Glob glob;
     public byte[] sesskey;
-	
+
     @SuppressWarnings("serial")
 	public class MessageException extends RuntimeException {
 	    public Message msg;
-		
+
 	    public MessageException(String text, Message msg) {
 		super(text);
 		this.msg = msg;
 	    }
 	}
-	
+
     public static class LoadingIndir extends Loading {
 	public int resid;
-	
+
 	public LoadingIndir(int resid) {
 	    this.resid = resid;
 	}
@@ -116,17 +116,17 @@ public class Session implements Owner {
 	private String resnm = null;
 	private int resver;
 	private Reference<Indir<Resource>> ind;
-	
+
 	private CachedRes(int id) {
 	    resid = id;
 	}
-	
+
 	private Indir<Resource> get() {
 	    Indir<Resource> ind = (this.ind == null)?null:(this.ind.get());
 	    if(ind == null) {
 		ind = new Indir<Resource>() {
 		    private Resource res;
-		    
+
 		    public Resource get() {
 			if(resnm == null)
 			    throw(new LoadingIndir(resid));
@@ -136,7 +136,7 @@ public class Session implements Owner {
 			    throw(new Resource.Loading(res));
 			return(res);
 		    }
-	
+
 		    public String toString() {
 			if(res == null) {
 			    return("<res:" + resid + ">");
@@ -152,7 +152,7 @@ public class Session implements Owner {
 	    }
 	    return(ind);
 	}
-	
+
 	public void set(String nm, int ver) {
 	    this.resnm = nm;
 	    this.resver = ver;
@@ -174,7 +174,7 @@ public class Session implements Owner {
     public Indir<Resource> getres(int id) {
 	return(cachedres(id).get());
     }
-    
+
     public int getresid(String name){
 	synchronized(rescache) {
 	    for(CachedRes cres : rescache.values()){
@@ -191,7 +191,7 @@ public class Session implements Owner {
 	int frame;
 	long recv;
 	long sent;
-		
+
 	public ObjAck(long id, int frame, long recv) {
 	    this.id = id;
 	    this.frame = frame;
@@ -199,13 +199,13 @@ public class Session implements Owner {
 	    this.sent = 0;
 	}
     }
-    
+
     private class Ticker extends HackThread {
 	public Ticker() {
 	    super("Server time ticker");
 	    setDaemon(true);
 	}
-		
+
 	public void run() {
 	    try {
 		while(true) {
@@ -219,15 +219,15 @@ public class Session implements Owner {
 	    } catch(InterruptedException e) {}
 	}
     }
-	
+
     private class RWorker extends HackThread {
 	boolean alive;
-		
+
 	public RWorker() {
 	    super("Session reader");
 	    setDaemon(true);
 	}
-		
+
 	private void gotack(int seq) {
 	    synchronized(pending) {
 		for(ListIterator<Message> i = pending.listIterator(); i.hasNext(); ) {
@@ -237,7 +237,7 @@ public class Session implements Owner {
 		}
 	    }
 	}
-		
+
 	private void getobjdata(Message msg) {
 	    OCache oc = glob.oc;
 	    while(msg.off < msg.blob.length) {
@@ -474,7 +474,7 @@ public class Session implements Owner {
 		sworker.notifyAll();
 	    }
 	}
-		
+
 	private void handlerel(Message msg) {
 	    if(msg.type == Message.RMSG_NEWWDG) {
 		synchronized(uimsgs) {
@@ -528,7 +528,7 @@ public class Session implements Owner {
 		throw(new MessageException("Unknown rmsg type: " + msg.type, msg));
 	    }
 	}
-		
+
 	private void getrel(int seq, Message msg) {
 	    if(seq == rseq) {
 		int lastack;
@@ -550,7 +550,7 @@ public class Session implements Owner {
 		waiting.put(seq, msg);
 	    }
 	}
-		
+
 	public void run() {
 	    try {
 		alive = true;
@@ -629,25 +629,25 @@ public class Session implements Owner {
 		}
 	    }
 	}
-		
+
 	public void interrupt() {
 	    alive = false;
 	    super.interrupt();
 	}
     }
-	
+
     private class SWorker extends HackThread {
-		
+
 	public SWorker() {
 	    super("Session writer");
 	    setDaemon(true);
 	}
-		
+
 	public void run() {
 	    try {
 		long to, last = 0, retries = 0;
 		while(true) {
-					
+
 		    long now = System.currentTimeMillis();
 		    if(state == "conn") {
 			if(now - last > 2000) {
@@ -794,7 +794,7 @@ public class Session implements Owner {
 	    }
 	}
     }
-	
+
     public Session(SocketAddress server, String username, byte[] cookie, Object... args) {
 	this.server = server;
 	this.username = username;
@@ -806,8 +806,8 @@ public class Session implements Owner {
 	} else {
 	    glob = new Glob(this, false);
 	}
-	
-	
+
+
 	try {
 	    sk = new DatagramSocket();
 	} catch(SocketException e) {
@@ -820,7 +820,7 @@ public class Session implements Owner {
 	ticker = new Ticker();
 	ticker.start();
     }
-		
+
     private void sendack(int seq) {
 	synchronized(sworker) {
 	    if(acktime < 0)
@@ -829,15 +829,15 @@ public class Session implements Owner {
 	    sworker.notifyAll();
 	}
     }
-	
+
     public void close() {
 	sworker.interrupt();
     }
-	
+
     public synchronized boolean alive() {
 	return(state != "dead");
     }
-	
+
     public void queuemsg(Message msg) {
 	msg.seq = tseq;
 	tseq = (tseq + 1) % 65536;
@@ -848,7 +848,7 @@ public class Session implements Owner {
 	    sworker.notify();
 	}
     }
-	
+
     public Message getuimsg() {
 	synchronized(uimsgs) {
 	    if(uimsgs.size() == 0)
@@ -856,14 +856,14 @@ public class Session implements Owner {
 	    return(uimsgs.remove());
 	}
     }
-	
+
     public void sendmsg(Message msg) {
 	byte[] buf = new byte[msg.blob.length + 1];
 	buf[0] = (byte)msg.type;
 	System.arraycopy(msg.blob, 0, buf, 1, msg.blob.length);
 	sendmsg(buf);
     }
-	
+
     public void sendmsg(byte[] msg) {
 	try {
 	    sk.send(new DatagramPacket(msg, msg.length, server));

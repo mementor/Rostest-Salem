@@ -39,17 +39,17 @@ public class CharWnd extends Window {
     public final Map<String, Attr> attrs = new HashMap<String, Attr>();
     public final SkillList csk, nsk;
     public final Widget attrwdgs;
-    public int cmod;
+    public int tmexp;
     public boolean skavail;
     private final SkillInfo ski;
-    private final Label cmodl;
-    
+    private final Label tmexpl;
+
     public static final Color GREEN = new Color(0xaaeeaa);
     public static final Color GRAY = new Color(0xbda3a3);
-    
+
     public static final Color METER_BORDER = new Color(133, 92, 62, 255);
     public static final Color METER_BACK = new Color(28, 28, 28, 255);
-    
+
     public static final Color REQ_ENOUGH = new Color(0x991616);
     public static final Color REQ_NOT_ENOUGH = new Color(0xFF3A3A);
     public static final Color FILL = new Color(0x006AA3);
@@ -59,7 +59,7 @@ public class CharWnd extends Window {
     public static final Color GAIN_FULL = new Color(0x6BA050);
     public static final Color GAIN_ENOUGH = new Color(0xA09740);
     public static final Color GAIN_SMALL = new Color(0xA36751);
-    
+
     @RName("chr")
     public static class $_ implements Factory {
 	public Widget create(Coord c, Widget parent, Object[] args) {
@@ -93,7 +93,7 @@ public class CharWnd extends Window {
 	attrnm = Collections.unmodifiableMap(an);
 	attrorder = Collections.unmodifiableList(ao);
     }
-    
+
     public static String attrbyname(String name){
 	for(Entry<String, String> entry : attrnm.entrySet()){
 	    if(entry.getValue().equals(name)){
@@ -102,53 +102,51 @@ public class CharWnd extends Window {
 	}
 	return null;
     }
-    
+
     public class Skill {
 	public final String nm;
 	public final Indir<Resource> res;
 	public final String[] costa;
 	public final int[] costv;
 	private int listidx;
-	
+
 	private Skill(String nm, Indir<Resource> res, String[] costa, int[] costv) {
 	    this.nm = nm;
 	    this.res = res;
 	    this.costa = costa;
 	    this.costv = costv;
 	}
-	
+
 	private Skill(String nm, Indir<Resource> res) {
 	    this(nm, res, new String[0], new int[0]);
 	}
-	
+
 	public int afforded() {
 	    int ret = 0;
 	    for(int i = 0; i < costa.length; i++) {
-		if(attrs.get(costa[i]).attr.comp * 100 < costv[i])
+		if(attrs.get(costa[i]).attr.base * 100 < costv[i])
 		    return(3);
-		if(attrs.get(costa[i]).sexp < costv[i])
+		if(attrs.get(costa[i]).exp < costv[i])
 		    ret = Math.max(ret, 2);
-		else if(attrs.get(costa[i]).hexp < costv[i])
-		    ret = Math.max(ret, 1);
 	    }
 	    return(ret);
 	}
     }
-    
+
     private static class SkillInfo extends RichTextBox {
 	final static RichText.Foundry skbodfnd;
 	Skill cur = null;
 	boolean d = false;
-	
+
 	static {
 	    skbodfnd = new RichText.Foundry(java.awt.font.TextAttribute.FAMILY, "SansSerif", java.awt.font.TextAttribute.SIZE, 9);
 	    skbodfnd.aa = true;
 	}
-	
+
 	public SkillInfo(Coord c, Coord sz, Widget parent) {
 	    super(c, sz, parent, "", skbodfnd);
 	}
-	
+
 	public void tick(double dt) {
 	    if(d) {
 		try {
@@ -169,7 +167,7 @@ public class CharWnd extends Window {
 		} catch(Loading e) {}
 	    }
 	}
-	
+
 	public void setsk(Skill sk) {
 	    d = (sk != null);
 	    cur = sk;
@@ -177,7 +175,7 @@ public class CharWnd extends Window {
 	    GItem.infoUpdated = System.currentTimeMillis();
 	}
     }
-    
+
     public static int[] sortattrs(final String[] attrs) {
 	Integer[] o = new Integer[attrs.length];
 	for(int i = 0; i < o.length; i++)
@@ -192,7 +190,7 @@ public class CharWnd extends Window {
 	    r[i] = o[i];
 	return(r);
     }
-    
+
     public Color[] attrcols(final String[] attrs){
 	Color[] c = new Color[attrs.length];
 	int i=0;
@@ -203,7 +201,7 @@ public class CharWnd extends Window {
 		    String costa = ski.cur.costa[j];
 		    int costv = ski.cur.costv[j];
 		    if(costa.equals(attr)){
-			if(this.attrs.get(costa).sexp < costv){
+			if(this.attrs.get(costa).exp < costv){
 			    c[i] = GREEN;
 			} else {
 			    c[i] = GRAY;
@@ -216,7 +214,7 @@ public class CharWnd extends Window {
 	}
 	return c;
     }
-    
+
     public static class SkillList extends Listbox<Skill> {
 	public Skill[] skills = new Skill[0];
 	private boolean loading = false;
@@ -238,11 +236,11 @@ public class CharWnd extends Window {
 		return(an.compareTo(bn));
 	    }
 	};
-	
+
 	public SkillList(Coord c, int w, int h, Widget parent) {
 	    super(c, parent, w, h, 20);
 	}
-	
+
 	public void tick(double dt) {
 	    if(loading) {
 		loading = false;
@@ -265,7 +263,7 @@ public class CharWnd extends Window {
 		g.atext("...", new Coord(25, 10), 0, 0.5);
 	    }
 	}
-	
+
 	public void pop(Collection<Skill> nsk) {
 	    Skill[] skills = nsk.toArray(new Skill[0]);
 	    sb.val = 0;
@@ -274,12 +272,12 @@ public class CharWnd extends Window {
 	    this.skills = skills;
 	    loading = true;
 	}
-	
+
 	public void change(Skill sk) {
 	    sel = sk;
 	}
     }
-    
+
     private void checkexp() {
 	skavail = false;
 	for(Skill sk : nsk.skills) {
@@ -297,7 +295,7 @@ public class CharWnd extends Window {
 	PUtils.monochromize(Resource.loadimg("gfx/hud/skills/plusu"), new Color(192, 192, 192)),
 	PUtils.glowmask(PUtils.glowmask(Resource.loadimg("gfx/hud/skills/plusu").getRaster()), 4, new Color(32, 255, 32)),
     };
-	
+
     public class Attr extends Widget implements Observer {
 	public final Coord
 	    imgc = new Coord(0, 1),
@@ -309,12 +307,12 @@ public class CharWnd extends Window {
 	public final String nm;
 	public final Resource res;
 	public final Glob.CAttr attr;
-	public int sexp, hexp;
+	public int exp, cap = 500;
 	public boolean av = false;
 	private Text rnm, rv, rexp;
 	private int cv;
 	private IButton pb;
-	
+
 	private Attr(String attr, Coord c, Widget parent) {
 	    super(c, new Coord(257, 15), parent);
 	    this.nm = attr;
@@ -344,12 +342,17 @@ public class CharWnd extends Window {
 		    }
 		};
 	}
-	
+
 	public void drawmeter(GOut g, Coord c, Coord sz) {
 	    g.chcolor(METER_BORDER);
 	    g.frect(c, sz);
 	    g.chcolor(METER_BACK);
 	    g.frect(c.add(1, 1), sz.sub(2, 2));
+	    if(av)
+		g.chcolor(0, (a == 1)?255:128, 0, 255);
+	    else
+		g.chcolor(0, 0, 128, 255);
+	    g.frect(c.add(1, 1), new Coord(((sz.x - 2) * Math.min(exp, cap)) / cap, sz.y - 2));
 	    if(ui.lasttip instanceof WItem.ItemTip) {
 		try {
 		    GItem item = ((WItem.ItemTip)ui.lasttip).item();
@@ -357,9 +360,9 @@ public class CharWnd extends Window {
 		    if(insp != null) {
 			for(int i = 0; i < insp.attrs.length; i++) {
 			    if(insp.attrs[i].equals(nm)) {
-				int w = ((sz.x - 2) * (insp.exp[i] + sexp)) / (attr.comp * 100);
-				if(w >= expsz.x - 2) {
-				    w = expsz.x - 2;
+				int w = Math.min(((sz.x - 2) * insp.exp[i]) / cap,
+						 sz.x - 2);
+				if(insp.exp[i] > cap) {
 				    g.chcolor(GAIN_ENOUGH);
 				} else {
 				    g.chcolor(GAIN_SMALL);
@@ -371,23 +374,23 @@ public class CharWnd extends Window {
 		    }
 		} catch(Loading e) {}
 	    }
-	    
+
 	    g.chcolor(FILL_GHOST);
-	    g.frect(c.add(1, 1), new Coord(((sz.x - 2) * sexp) / (attr.comp * 100), sz.y - 2));
+	    g.frect(c.add(1, 1), new Coord(((sz.x - 2) * exp) / (attr.comp * 100), sz.y - 2));
 	    if(av) {
 		g.chcolor((a == 1)?FILL_FULL:FILL_ENOUGH);
 	    } else {
 		g.chcolor(FILL);
 	    }
-	    g.frect(c.add(1, 1), new Coord(((sz.x - 2) * hexp) / (attr.comp * 100), sz.y - 2));
-	    
+	    g.frect(c.add(1, 1), new Coord(((sz.x - 2) * cap) / (attr.comp * 100), sz.y - 2));
+
 	    if(nsk.sel != null) {
 		Skill sk = nsk.sel;
 		for(int i = 0; i < sk.costa.length; i++) {
 		    if(sk.costa[i].equals(nm)) {
-			int w = Math.min(((sz.x - 2) * sk.costv[i]) / (attr.comp * 100),
+			int w = Math.min(((sz.x - 2) * sk.costv[i]) / cap,
 					 sz.x - 2);
-			if(sk.costv[i] > (attr.comp * 100))
+			if(sk.costv[i] > (attr.base * 100))
 			    g.chcolor(REQ_NOT_ENOUGH);
 			else
 			    g.chcolor(REQ_ENOUGH);
@@ -399,7 +402,7 @@ public class CharWnd extends Window {
 	    }
 	    g.chcolor();
 	    if(rexp == null)
-		rexp = Text.render(String.format("%d/%d", sexp, attr.comp * 100));
+		rexp = Text.render(String.format("%d/%d", exp, cap));
 	    g.aimage(rexp.tex(), c.add(sz.x / 2, 1), 0.5, 0);
 	}
 
@@ -415,7 +418,7 @@ public class CharWnd extends Window {
 	    drawmeter(g, expc, expsz);
 	    super.draw(g);
 	}
-	
+
 	private int a = 0;
 	public boolean mousedown(Coord c, int btn) {
 	    if((btn == 1) && c.isect(expc, expsz)) {
@@ -427,7 +430,7 @@ public class CharWnd extends Window {
 	    }
 	    return(super.mousedown(c, btn));
 	}
-	
+
 	public boolean mouseup(Coord c, int btn) {
 	    if((btn == 1) && (a == 1)) {
 		a = 0;
@@ -438,7 +441,7 @@ public class CharWnd extends Window {
 	    }
 	    return(super.mouseup(c, btn));
 	}
-	
+
 	public void buy() {
 	    CharWnd.this.wdgmsg("sattr", nm);
 	}
@@ -466,14 +469,16 @@ public class CharWnd extends Window {
 	}
 	attrwdgs.pack();
 	y = attrwdgs.c.y + attrwdgs.sz.y + 15;
-	cmodl = new Label(new Coord(0, y + 5), this, "Learning Ability: ");
-	new CPButton(new Coord(580, y), 40, this, "Reset") {
-	    {tooltip = RichText.render("Discard all currently accumulated proficiency points, and reset learning ability to 100%.", 250).tex();}
-
-	    public void cpclick() {
-		CharWnd.this.wdgmsg("lreset");
-	    }
-	};
+	tmexpl = new Label(new Coord(0, y + 5), this, "Inspiration: ") {
+		Glob.CAttr ac = ui.sess.glob.cattr.get("scap"), ar = ui.sess.glob.cattr.get("srate");
+		int lc = -1, lr = -1;
+		Tex tt = null;
+		public Object tooltip(Coord c, Widget prev) {
+		    if((tt == null) || (ac.comp != lc) || (ar.comp != lr))
+			tt = Text.renderf(Color.WHITE, "Cap: %,d, Rate: %.2f/s", lc = ac.comp, 3 * (lr = ar.comp) / 1000.0).tex();
+		    return(tt);
+		}
+	    };
 	new Label(new Coord(270, 0), this, "Skills:");
 	new Label(new Coord(270, 30), this, "Current:");
 	this.csk = new SkillList(new Coord(270, 45), 170, 6, this) {
@@ -506,7 +511,7 @@ public class CharWnd extends Window {
 		    super.drawitem(g, sk);
 		    g.chcolor();
 		}
-		
+
 		public void change(Skill sk) {
 		    Skill p = sel;
 		    super.change(sk);
@@ -537,7 +542,7 @@ public class CharWnd extends Window {
 	};
 	this.ski = new SkillInfo(new Coord(450, 45), new Coord(190, 278), this);
     }
-    
+
     private void decsklist(Collection<Skill> buf, Object[] args, int a) {
 	while(a < args.length) {
 	    String nm = (String)args[a++];
@@ -554,18 +559,18 @@ public class CharWnd extends Window {
 	    buf.add(new Skill(nm, res, costa, costv));
 	}
     }
-    
+
     private Collection<Skill> acccsk, accnsk;
     public void uimsg(String msg, Object... args) {
 	if(msg == "exp") {
 	    for(int i = 0; i < args.length; i += 4) {
 		String nm = (String)args[i];
-		int s = (Integer)args[i + 1];
-		int h = (Integer)args[i + 2];
+		int c = (Integer)args[i + 1];
+		int e = (Integer)args[i + 2];
 		boolean av = ((Integer)args[i + 3]) != 0;
 		Attr a = attrs.get(nm);
-		a.sexp = s;
-		a.hexp = h;
+		a.cap = c;
+		a.exp = e;
 		a.rexp = null;
 		a.av = av;
 	    }
@@ -601,9 +606,9 @@ public class CharWnd extends Window {
 		accnsk = buf;
 	    else
 		nsk.pop(buf);
-	} else if(msg == "cmod") {
-	    cmod = (Integer)args[0];
-	    cmodl.settext(String.format("Learning ability: %d%%", cmod));
+	} else if (msg == "tmexp") {
+	    tmexp = (Integer)args[0];
+	    tmexpl.settext(String.format("Inspiration: %,d", tmexp));
 	}
     }
 }

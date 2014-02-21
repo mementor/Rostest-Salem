@@ -206,33 +206,34 @@ public class MenuGrid extends Widget {
 	return output;
     }
     
-    public static BufferedImage getFood(String name){
-	Item itm = Wiki.get(name);
-	if(itm != null){
-	    Map<String, Float[]> food = itm.food;
-	    if(food != null){
-		float[] def = new float[]{0, 0, 0, 0};
-		float[] heal = safeFloat(food.get("Heals"), def);
-		float[] salt = safeFloat(food.get("Salt"), def);
-		float[] merc = safeFloat(food.get("Mercury"), def);
-		float[] sulph = safeFloat(food.get("Sulphur"), def);
-		float[] lead = safeFloat(food.get("Lead"), def);
-		int[] tempers = new int[4];
-		int[][] evs = new int[4][4];
-		for(int i=0; i<4; i++){
-		    tempers[i] = (int) (1000*heal[i]);
-		    evs[0][i] = (int) (1000*salt[i]);
-		    evs[1][i] = (int) (1000*merc[i]);
-		    evs[2][i] = (int) (1000*sulph[i]);
-		    evs[3][i] = (int) (1000*lead[i]);
-		}
-		FoodInfo fi = new FoodInfo(null, tempers);
-		GobbleInfo gi = new GobbleInfo(null, evs, 0);
-		return ItemInfo.catimgs(3, fi.longtip(), gi.longtip());
-	    }
-	}
-	return null;
-    }
+ //	Removed due to last update
+ //        public static BufferedImage getFood(String name){
+	// Item itm = Wiki.get(name);
+	// if(itm != null){
+	//     Map<String, Float[]> food = itm.food;
+	//     if(food != null){
+	// 	float[] def = new float[]{0, 0, 0, 0};
+	// 	float[] heal = safeFloat(food.get("Heals"), def);
+	// 	float[] salt = safeFloat(food.get("Salt"), def);
+	// 	float[] merc = safeFloat(food.get("Mercury"), def);
+	// 	float[] sulph = safeFloat(food.get("Sulphur"), def);
+	// 	float[] lead = safeFloat(food.get("Lead"), def);
+	// 	int[] tempers = new int[4];
+	// 	int[][] evs = new int[4][4];
+	// 	for(int i=0; i<4; i++){
+	// 	    tempers[i] = (int) (1000*heal[i]);
+	// 	    evs[0][i] = (int) (1000*salt[i]);
+	// 	    evs[1][i] = (int) (1000*merc[i]);
+	// 	    evs[2][i] = (int) (1000*sulph[i]);
+	// 	    evs[3][i] = (int) (1000*lead[i]);
+	// 	}
+	// 	FoodInfo fi = new FoodInfo(null, tempers);
+	// 	GobbleInfo gi = new GobbleInfo(null, evs, 0);
+	// 	return ItemInfo.catimgs(3, fi.longtip(), gi.longtip());
+	//     }
+	// }
+	// return null;
+ //    }
     
     public static BufferedImage getArtifact(String name){
 	Item itm = Wiki.get(name);
@@ -298,7 +299,7 @@ public class MenuGrid extends Widget {
 	if(withpg) {
 	    if(pg != null){tt += "\n\n" + pg.text;}
 	    xp = getXPgain(ad.name);
-	    food = getFood(ad.name);
+	    //food = getFood(ad.name);
 	    slots = getSlots(ad.name);
 	    art = getArtifact(ad.name);
 	}
